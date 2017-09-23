@@ -1,0 +1,28 @@
+* This is my dotfiles config
+  #+BEGIN_SRC sh
+  git init --bare $HOME/.cfg
+  alias config='git --git-dir=$HOME/.cfg/ --work-tree=$HOME'
+  config config --local status.showUntrackedFiles no
+  echo "alias config='git --git-dir=$HOME/.cfg/ --work-tree=$HOME'" >> $HOME/.zshrc
+  #+END_SRC
+
+  #+BEGIN_SRC sh
+  alias config='git --git-dir=$HOME/.cfg/ --work-tree=$HOME'
+  echo ".cfg" >> .gitignore
+  git clone --bare https://github.com/dehong-s/my-dotfiles.git $HOME/.cfg
+  function config {
+     git --git-dir=$HOME/.cfg/ --work-tree=$HOME $@
+  }
+  mkdir -p .config-backup
+  config checkout
+  if [ $? = 0 ]; then
+    echo "Checked out config.";
+    else
+      echo "Backing up pre-existing dot files.";
+      config checkout 2>&1 | egrep "\s+\." | awk {'print $1'} | xargs -I{} mv {} .config-backup/{}
+  fi;
+  config checkout
+  config config status.showUntrackedFiles no
+  #+END_SRC
+
+  [[https://developer.atlassian.com/blog/2016/02/best-way-to-store-dotfiles-git-bare-repo/][reference]]
